@@ -1,0 +1,69 @@
+{
+  "name": "tuk-tuk-tracking-api",
+  "version": "1.0.0",
+  "description": "Real-Time Three-Wheeler (Tuk-Tuk) Tracking & Movement Logging System for Sri Lanka Law Enforcement",
+  "main": "handler.js",
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "start": "node handler.js",
+    "dev": "nodemon --experimental-specifier-resolution=node src/server.js",
+    "build": "echo 'No build step required'",
+    "lint": "eslint src/ scripts/ --ext .js",
+    "lint:fix": "eslint src/ scripts/ --ext .js --fix",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest --runInBand",
+    "test:coverage": "node --experimental-vm-modules node_modules/.bin/jest --coverage --runInBand",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate deploy",
+    "db:migrate:dev": "prisma migrate dev",
+    "db:studio": "prisma studio",
+    "db:seed": "node scripts/seed/index.js",
+    "db:reset": "prisma migrate reset --force && node scripts/seed/index.js",
+    "simulate": "node scripts/simulate/generate-location-history.js",
+    "deploy:dev": "serverless deploy --stage dev",
+    "deploy:prod": "serverless deploy --stage prod"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.10.2",
+    "bcryptjs": "^2.4.3",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.3",
+    "express-rate-limit": "^7.2.0",
+    "express-validator": "^7.0.1",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "serverless-http": "^3.2.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0",
+    "uuid": "^9.0.1",
+    "winston": "^3.19.0",
+    "winston-cloudwatch": "^6.3.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.4.0",
+    "eslint": "^9.4.0",
+    "globals": "^15.3.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.0",
+    "prisma": "^5.10.2",
+    "serverless": "^3.38.0",
+    "serverless-dotenv-plugin": "^6.0.0",
+    "serverless-offline": "^13.6.0",
+    "supertest": "^7.0.0"
+  },
+  "jest": {
+    "transform": {},
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.js"
+    ]
+  }
+}
