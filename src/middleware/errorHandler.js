@@ -5,7 +5,6 @@ const ERROR_CODES = {
   P2003: "FOREIGN_KEY_VIOLATION",
   P2025: "RESOURCE_NOT_FOUND",
   P2016: "QUERY_ERROR",
-  s,
 };
 
 //Global error-handling middleware
