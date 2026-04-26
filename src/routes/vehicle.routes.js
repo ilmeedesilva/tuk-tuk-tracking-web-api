@@ -1,13 +1,13 @@
-import { Router } from "express";
-import { body, param, query } from "express-validator";
-import * as vehicleController from "../controllers/vehicle.controller.js";
+import { Router } from 'express';
+import { body, param, query } from 'express-validator';
+import * as vehicleController from '../controllers/vehicle.controller.js';
 import {
   authenticate,
   authorise,
   authoriseMinRole,
   scopeGuard,
-} from "../middleware/auth.js";
-import { handleValidation } from "../middleware/validate.js";
+} from '../middleware/auth.js';
+import { handleValidation } from '../middleware/validate.js';
 
 const router = Router();
 router.use(authenticate);
@@ -63,16 +63,16 @@ router.use(authenticate);
  *                 meta: { $ref: '#/components/schemas/PaginationMeta' }
  */
 router.get(
-  "/",
+  '/',
   scopeGuard,
   [
-    query("page").optional().isInt({ min: 1 }).toInt(),
-    query("limit").optional().isInt({ min: 1, max: 100 }).toInt(),
-    query("status").optional().isIn(["ACTIVE", "INACTIVE", "SUSPENDED"]),
-    query("sort")
+    query('page').optional().isInt({ min: 1 }).toInt(),
+    query('limit').optional().isInt({ min: 1, max: 100 }).toInt(),
+    query('status').optional().isIn(['ACTIVE', 'INACTIVE', 'SUSPENDED']),
+    query('sort')
       .optional()
-      .isIn(["registrationNumber", "driverName", "status", "createdAt"]),
-    query("order").optional().isIn(["asc", "desc"]),
+      .isIn(['registrationNumber', 'driverName', 'status', 'createdAt']),
+    query('order').optional().isIn(['asc', 'desc']),
   ],
   handleValidation,
   vehicleController.list,
@@ -103,8 +103,8 @@ router.get(
  *         $ref: '#/components/responses/NotFound'
  */
 router.get(
-  "/:id",
-  [param("id").notEmpty()],
+  '/:id',
+  [param('id').notEmpty()],
   handleValidation,
   vehicleController.get,
 );
@@ -128,17 +128,17 @@ router.get(
  *         description: Registration number or driver NIC already exists
  */
 router.post(
-  "/",
-  authoriseMinRole("DISTRICT_OFFICER"),
+  '/',
+  authoriseMinRole('DISTRICT_OFFICER'),
   [
-    body("registrationNumber")
+    body('registrationNumber')
       .trim()
       .notEmpty()
-      .withMessage("Registration number is required"),
-    body("driverName").trim().notEmpty(),
-    body("driverNic").trim().notEmpty().withMessage("Driver NIC is required"),
-    body("driverContact").optional().trim(),
-    body("districtId").notEmpty().withMessage("District ID is required"),
+      .withMessage('Registration number is required'),
+    body('driverName').trim().notEmpty(),
+    body('driverNic').trim().notEmpty().withMessage('Driver NIC is required'),
+    body('driverContact').optional().trim(),
+    body('districtId').notEmpty().withMessage('District ID is required'),
   ],
   handleValidation,
   vehicleController.create,
@@ -165,14 +165,14 @@ router.post(
  *         description: Updated
  */
 router.put(
-  "/:id",
-  authoriseMinRole("DISTRICT_OFFICER"),
+  '/:id',
+  authoriseMinRole('DISTRICT_OFFICER'),
   [
-    param("id").notEmpty(),
-    body("registrationNumber").optional().trim().notEmpty(),
-    body("driverName").optional().trim().notEmpty(),
-    body("driverNic").optional().trim().notEmpty(),
-    body("driverContact").optional().trim(),
+    param('id').notEmpty(),
+    body('registrationNumber').optional().trim().notEmpty(),
+    body('driverName').optional().trim().notEmpty(),
+    body('driverNic').optional().trim().notEmpty(),
+    body('driverContact').optional().trim(),
   ],
   handleValidation,
   vehicleController.update,
@@ -205,13 +205,13 @@ router.put(
  *         description: Status updated
  */
 router.patch(
-  "/:id/status",
-  authoriseMinRole("DISTRICT_OFFICER"),
+  '/:id/status',
+  authoriseMinRole('DISTRICT_OFFICER'),
   [
-    param("id").notEmpty(),
-    body("status")
-      .isIn(["ACTIVE", "INACTIVE", "SUSPENDED"])
-      .withMessage("Invalid status value"),
+    param('id').notEmpty(),
+    body('status')
+      .isIn(['ACTIVE', 'INACTIVE', 'SUSPENDED'])
+      .withMessage('Invalid status value'),
   ],
   handleValidation,
   vehicleController.setStatus,
@@ -232,6 +232,6 @@ router.patch(
  *       204:
  *         description: Deleted
  */
-router.delete("/:id", authorise("HQ_ADMIN"), vehicleController.remove);
+router.delete('/:id', authorise('HQ_ADMIN'), vehicleController.remove);
 
 export default router;

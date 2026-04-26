@@ -1,25 +1,25 @@
-import express from "express";
-import cors from "cors";
-import helmet from "helmet";
-import compression from "compression";
-import morgan from "morgan";
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import compression from 'compression';
+import morgan from 'morgan';
 
-import swaggerUi from "swagger-ui-express";
-import { swaggerSpec } from "./config/swagger.js";
-import { globalRateLimiter } from "./middleware/rateLimiter.js";
-import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
-import logger from "./utils/logger.js";
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './config/swagger.js';
+import { globalRateLimiter } from './middleware/rateLimiter.js';
+import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
+import logger from './utils/logger.js';
 
 // Route imports
-import authRoutes from "./routes/auth.routes.js";
-import provinceRoutes from "./routes/province.routes.js";
-import districtRoutes from "./routes/district.routes.js";
-import policeStationRoutes from "./routes/policeStation.routes.js";
-import userRoutes from "./routes/user.routes.js";
-import vehicleRoutes from "./routes/vehicle.routes.js";
-import deviceRoutes from "./routes/device.routes.js";
-import locationPingRoutes from "./routes/locationPing.routes.js";
-import liveTrackingRoutes from "./routes/liveTracking.routes.js";
+import authRoutes from './routes/auth.routes.js';
+import provinceRoutes from './routes/province.routes.js';
+import districtRoutes from './routes/district.routes.js';
+import policeStationRoutes from './routes/policeStation.routes.js';
+import userRoutes from './routes/user.routes.js';
+import vehicleRoutes from './routes/vehicle.routes.js';
+import deviceRoutes from './routes/device.routes.js';
+import locationPingRoutes from './routes/locationPing.routes.js';
+import liveTrackingRoutes from './routes/liveTracking.routes.js';
 
 const app = express();
 
@@ -29,10 +29,10 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https:"],
-        styleSrc: ["'self'", "'unsafe-inline'", "https:"],
-        imgSrc: ["'self'", "data:", "https:"],
-        connectSrc: ["'self'", "https:"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'https:'],
+        styleSrc: ["'self'", "'unsafe-inline'", 'https:'],
+        imgSrc: ["'self'", 'data:', 'https:'],
+        connectSrc: ["'self'", 'https:'],
       },
     },
     crossOriginEmbedderPolicy: false,
@@ -40,25 +40,25 @@ app.use(
 );
 
 const allowedOrigins =
-  process.env.ALLOWED_ORIGINS?.split(",").map((o) => o.trim()) || [];
+  process.env.ALLOWED_ORIGINS?.split(',').map((o) => o.trim()) || [];
 app.use(
   cors({
     origin:
-      allowedOrigins.length > 0 && !allowedOrigins.includes("*")
+      allowedOrigins.length > 0 && !allowedOrigins.includes('*')
         ? allowedOrigins
-        : "*",
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+        : '*',
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-      "X-Request-ID",
-      "If-None-Match",
+      'Content-Type',
+      'Authorization',
+      'X-Request-ID',
+      'If-None-Match',
     ],
     exposedHeaders: [
-      "ETag",
-      "X-Request-ID",
-      "X-RateLimit-Remaining",
-      "X-Total-Count",
+      'ETag',
+      'X-Request-ID',
+      'X-RateLimit-Remaining',
+      'X-Total-Count',
     ],
     credentials: false,
     maxAge: 86400,
@@ -68,13 +68,13 @@ app.use(
 // General Middleware
 
 app.use(compression());
-app.use(express.json({ limit: "1mb" }));
-app.use(express.urlencoded({ extended: true, limit: "1mb" }));
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
 // HTTP request logging
-if (process.env.NODE_ENV !== "test") {
+if (process.env.NODE_ENV !== 'test') {
   app.use(
-    morgan("combined", {
+    morgan('combined', {
       stream: { write: (message) => logger.http(message.trim()) },
     }),
   );
@@ -82,27 +82,27 @@ if (process.env.NODE_ENV !== "test") {
 
 // Attach unique request ID to each request
 app.use((req, _res, next) => {
-  req.requestId = req.headers["x-request-id"] || crypto.randomUUID();
+  req.requestId = req.headers['x-request-id'] || crypto.randomUUID();
   next();
 });
 
 // Rate Limiting
 
-app.use("/api/", globalRateLimiter);
+app.use('/api/', globalRateLimiter);
 
 // API Documentation (Swagger)
 
-app.get("/api/docs.json", (_req, res) => {
-  res.setHeader("Content-Type", "application/json");
+app.get('/api/docs.json', (_req, res) => {
+  res.setHeader('Content-Type', 'application/json');
   res.send(swaggerSpec);
 });
 
 app.use(
-  "/api/docs",
+  '/api/docs',
   swaggerUi.serve,
   swaggerUi.setup(swaggerSpec, {
-    customCss: ".swagger-ui .topbar { display: none }",
-    customSiteTitle: "Tuk-Tuk Tracking API — Sri Lanka Police",
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'Tuk-Tuk Tracking API — Sri Lanka Police',
   }),
 );
 
@@ -164,19 +164,19 @@ app.use(
  *                   type: string
  *                   format: date-time
  */
-app.get("/health", (_req, res) => {
+app.get('/health', (_req, res) => {
   res.json({
-    status: "healthy",
-    service: "tuk-tuk-tracking-api",
-    version: process.env.npm_package_version || "1.0.0",
-    environment: process.env.NODE_ENV || "development",
+    status: 'healthy',
+    service: 'tuk-tuk-tracking-api',
+    version: process.env.npm_package_version || '1.0.0',
+    environment: process.env.NODE_ENV || 'development',
     uptime: process.uptime(),
     timestamp: new Date().toISOString(),
   });
 });
 
 // API Routes
-const API_PREFIX = "/api/v1";
+const API_PREFIX = '/api/v1';
 
 app.use(`${API_PREFIX}/auth`, authRoutes);
 app.use(`${API_PREFIX}/provinces`, provinceRoutes);

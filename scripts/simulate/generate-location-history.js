@@ -1,5 +1,5 @@
-import "dotenv/config";
-import { PrismaClient } from "@prisma/client";
+import 'dotenv/config';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -54,21 +54,21 @@ function generateHeading() {
 
 //Generate a plausible speed for a tuk-tuk.
 
-function generateSpeed(type = "city") {
-  if (type === "parked") {
+function generateSpeed(type = 'city') {
+  if (type === 'parked') {
     return 0;
   }
-  if (type === "highway") {
+  if (type === 'highway') {
     return Math.round(35 + Math.random() * 35);
   }
   return Math.round(5 + Math.random() * 30);
 }
 
 async function generateHistory() {
-  console.log("📡 Generating location history (8 days × 200 vehicles)...\n");
+  console.log('📡 Generating location history (8 days × 200 vehicles)...\n');
 
   const vehicles = await prisma.vehicle.findMany({
-    where: { status: "ACTIVE" },
+    where: { status: 'ACTIVE' },
     include: { district: true },
     take: 200,
   });
@@ -148,7 +148,7 @@ async function generateHistory() {
           }
         }
 
-        const speed = generateSpeed(Math.random() < 0.2 ? "highway" : "city");
+        const speed = generateSpeed(Math.random() < 0.2 ? 'highway' : 'city');
 
         pings.push({
           vehicleId: vehicle.id,
@@ -189,14 +189,14 @@ async function generateHistory() {
           vehicleId: vehicle.id,
           latitude: currentLat,
           longitude: currentLng,
-          speed: generateSpeed("city"),
+          speed: generateSpeed('city'),
           heading: generateHeading(),
           timestamp: now,
         },
         update: {
           latitude: currentLat,
           longitude: currentLng,
-          speed: generateSpeed("city"),
+          speed: generateSpeed('city'),
           heading: generateHeading(),
           timestamp: now,
         },
@@ -210,7 +210,7 @@ async function generateHistory() {
     }
   }
 
-  console.log("\n✅ Location history generation complete!");
+  console.log('\n✅ Location history generation complete!');
   console.log(`   📍 Total pings inserted: ${totalPings.toLocaleString()}`);
   console.log(`   🚗 Vehicles processed: ${vehicles.length}`);
   console.log(
@@ -220,7 +220,7 @@ async function generateHistory() {
 
 generateHistory()
   .catch((err) => {
-    console.error("❌ Simulation failed:", err);
+    console.error('❌ Simulation failed:', err);
     process.exit(1);
   })
   .finally(() => prisma.$disconnect());

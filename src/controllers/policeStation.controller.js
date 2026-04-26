@@ -1,5 +1,5 @@
-import * as stationService from "../services/policeStation.service.js";
-import { sendSuccess, sendCreated } from "../utils/response.js";
+import * as stationService from '../services/policeStation.service.js';
+import { sendSuccess, sendCreated } from '../utils/response.js';
 
 export const list = async (req, res, next) => {
   try {

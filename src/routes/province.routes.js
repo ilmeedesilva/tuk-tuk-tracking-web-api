@@ -1,8 +1,8 @@
-import { Router } from "express";
-import { body, param, query } from "express-validator";
-import * as provinceController from "../controllers/province.controller.js";
-import { authenticate, authorise } from "../middleware/auth.js";
-import { handleValidation } from "../middleware/validate.js";
+import { Router } from 'express';
+import { body, param, query } from 'express-validator';
+import * as provinceController from '../controllers/province.controller.js';
+import { authenticate, authorise } from '../middleware/auth.js';
+import { handleValidation } from '../middleware/validate.js';
 
 const router = Router();
 
@@ -55,12 +55,12 @@ router.use(authenticate);
  *         $ref: '#/components/responses/Unauthorized'
  */
 router.get(
-  "/",
+  '/',
   [
-    query("page").optional().isInt({ min: 1 }).toInt(),
-    query("limit").optional().isInt({ min: 1, max: 100 }).toInt(),
-    query("sort").optional().isIn(["name", "code", "createdAt"]),
-    query("order").optional().isIn(["asc", "desc"]),
+    query('page').optional().isInt({ min: 1 }).toInt(),
+    query('limit').optional().isInt({ min: 1, max: 100 }).toInt(),
+    query('sort').optional().isIn(['name', 'code', 'createdAt']),
+    query('order').optional().isIn(['asc', 'desc']),
   ],
   handleValidation,
   provinceController.list,
@@ -92,8 +92,8 @@ router.get(
  *         $ref: '#/components/responses/NotFound'
  */
 router.get(
-  "/:id",
-  [param("id").notEmpty()],
+  '/:id',
+  [param('id').notEmpty()],
   handleValidation,
   provinceController.get,
 );
@@ -119,16 +119,16 @@ router.get(
  *         description: Province with that name/code already exists
  */
 router.post(
-  "/",
-  authorise("HQ_ADMIN"),
+  '/',
+  authorise('HQ_ADMIN'),
   [
-    body("name").trim().notEmpty().withMessage("Province name is required"),
-    body("code")
+    body('name').trim().notEmpty().withMessage('Province name is required'),
+    body('code')
       .trim()
       .notEmpty()
       .toUpperCase()
       .isLength({ min: 2, max: 6 })
-      .withMessage("Province code must be 2–6 characters"),
+      .withMessage('Province code must be 2–6 characters'),
   ],
   handleValidation,
   provinceController.create,
@@ -158,12 +158,12 @@ router.post(
  *         $ref: '#/components/responses/NotFound'
  */
 router.put(
-  "/:id",
-  authorise("HQ_ADMIN"),
+  '/:id',
+  authorise('HQ_ADMIN'),
   [
-    param("id").notEmpty(),
-    body("name").optional().trim().notEmpty(),
-    body("code").optional().trim().toUpperCase().isLength({ min: 2, max: 6 }),
+    param('id').notEmpty(),
+    body('name').optional().trim().notEmpty(),
+    body('code').optional().trim().toUpperCase().isLength({ min: 2, max: 6 }),
   ],
   handleValidation,
   provinceController.update,
@@ -186,6 +186,6 @@ router.put(
  *       409:
  *         description: Cannot delete — province has districts
  */
-router.delete("/:id", authorise("HQ_ADMIN"), provinceController.remove);
+router.delete('/:id', authorise('HQ_ADMIN'), provinceController.remove);
 
 export default router;

@@ -1,12 +1,12 @@
-import { Router } from "express";
-import { param, query } from "express-validator";
-import * as liveController from "../controllers/liveTracking.controller.js";
+import { Router } from 'express';
+import { param, query } from 'express-validator';
+import * as liveController from '../controllers/liveTracking.controller.js';
 import {
   authenticate,
   authoriseMinRole,
   scopeGuard,
-} from "../middleware/auth.js";
-import { handleValidation } from "../middleware/validate.js";
+} from '../middleware/auth.js';
+import { handleValidation } from '../middleware/validate.js';
 
 const router = Router();
 router.use(authenticate);
@@ -60,13 +60,13 @@ router.use(authenticate);
  *         $ref: '#/components/responses/Unauthorized'
  */
 router.get(
-  "/",
-  authoriseMinRole("STATION_OFFICER"),
+  '/',
+  authoriseMinRole('STATION_OFFICER'),
   scopeGuard,
   [
-    query("page").optional().isInt({ min: 1 }).toInt(),
-    query("limit").optional().isInt({ min: 1, max: 100 }).toInt(),
-    query("status").optional().isIn(["ACTIVE", "INACTIVE", "SUSPENDED"]),
+    query('page').optional().isInt({ min: 1 }).toInt(),
+    query('limit').optional().isInt({ min: 1, max: 100 }).toInt(),
+    query('status').optional().isIn(['ACTIVE', 'INACTIVE', 'SUSPENDED']),
   ],
   handleValidation,
   liveController.getLiveView,
@@ -105,8 +105,8 @@ router.get(
  *                     vehiclesNoData: { type: integer, description: 'Never sent a ping' }
  */
 router.get(
-  "/summary",
-  authoriseMinRole("STATION_OFFICER"),
+  '/summary',
+  authoriseMinRole('STATION_OFFICER'),
   scopeGuard,
   liveController.getSummary,
 );
@@ -136,9 +136,9 @@ router.get(
  *         description: Vehicle not found or no location data yet
  */
 router.get(
-  "/:vehicleId",
-  authoriseMinRole("STATION_OFFICER"),
-  [param("vehicleId").notEmpty()],
+  '/:vehicleId',
+  authoriseMinRole('STATION_OFFICER'),
+  [param('vehicleId').notEmpty()],
   handleValidation,
   liveController.getVehicleLocation,
 );

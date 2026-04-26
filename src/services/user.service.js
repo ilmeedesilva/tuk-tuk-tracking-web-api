@@ -1,11 +1,11 @@
-import bcrypt from "bcryptjs";
-import { prisma } from "../config/database.js";
-import { createError } from "../middleware/errorHandler.js";
+import bcrypt from 'bcryptjs';
+import { prisma } from '../config/database.js';
+import { createError } from '../middleware/errorHandler.js';
 import {
   parsePagination,
   buildPaginationMeta,
   parseSort,
-} from "../utils/response.js";
+} from '../utils/response.js';
 
 const SALT_ROUNDS = 12;
 const SAFE_SELECT = {
@@ -27,24 +27,24 @@ const SAFE_SELECT = {
 };
 
 const ALLOWED_SORT = [
-  "username",
-  "fullName",
-  "role",
-  "createdAt",
-  "lastLoginAt",
+  'username',
+  'fullName',
+  'role',
+  'createdAt',
+  'lastLoginAt',
 ];
 
 const buildWhere = (query, callerUser) => {
   const where = {};
 
   // Scope enforcement for non-HQ callers
-  if (callerUser.role === "PROVINCIAL_ADMIN") {
+  if (callerUser.role === 'PROVINCIAL_ADMIN') {
     where.provinceId = callerUser.provinceId;
   }
-  if (callerUser.role === "DISTRICT_OFFICER") {
+  if (callerUser.role === 'DISTRICT_OFFICER') {
     where.districtId = callerUser.districtId;
   }
-  if (callerUser.role === "STATION_OFFICER") {
+  if (callerUser.role === 'STATION_OFFICER') {
     where.policeStationId = callerUser.policeStationId;
   }
 
@@ -53,20 +53,20 @@ const buildWhere = (query, callerUser) => {
     where.role = query.role;
   }
   if (query.isActive !== undefined) {
-    where.isActive = query.isActive === "true";
+    where.isActive = query.isActive === 'true';
   }
-  if (query.districtId && callerUser.role === "HQ_ADMIN") {
+  if (query.districtId && callerUser.role === 'HQ_ADMIN') {
     where.districtId = query.districtId;
   }
-  if (query.provinceId && callerUser.role === "HQ_ADMIN") {
+  if (query.provinceId && callerUser.role === 'HQ_ADMIN') {
     where.provinceId = query.provinceId;
   }
 
   if (query.search) {
     where.OR = [
-      { username: { contains: query.search, mode: "insensitive" } },
-      { fullName: { contains: query.search, mode: "insensitive" } },
-      { email: { contains: query.search, mode: "insensitive" } },
+      { username: { contains: query.search, mode: 'insensitive' } },
+      { fullName: { contains: query.search, mode: 'insensitive' } },
+      { email: { contains: query.search, mode: 'insensitive' } },
     ];
   }
   return where;
@@ -97,7 +97,7 @@ export const getUser = async (id) => {
     select: SAFE_SELECT,
   });
   if (!user) {
-    throw createError(404, "USER_NOT_FOUND", "User not found");
+    throw createError(404, 'USER_NOT_FOUND', 'User not found');
   }
   return user;
 };
@@ -116,7 +116,7 @@ export const createUser = async (data) => {
 export const updateUser = async (id, data) => {
   const exists = await prisma.user.findUnique({ where: { id } });
   if (!exists) {
-    throw createError(404, "USER_NOT_FOUND", "User not found");
+    throw createError(404, 'USER_NOT_FOUND', 'User not found');
   }
 
   const updateData = { ...data };
@@ -135,7 +135,7 @@ export const updateUser = async (id, data) => {
 export const setUserActive = async (id, isActive) => {
   const exists = await prisma.user.findUnique({ where: { id } });
   if (!exists) {
-    throw createError(404, "USER_NOT_FOUND", "User not found");
+    throw createError(404, 'USER_NOT_FOUND', 'User not found');
   }
   return prisma.user.update({
     where: { id },
@@ -147,7 +147,7 @@ export const setUserActive = async (id, isActive) => {
 export const deleteUser = async (id) => {
   const exists = await prisma.user.findUnique({ where: { id } });
   if (!exists) {
-    throw createError(404, "USER_NOT_FOUND", "User not found");
+    throw createError(404, 'USER_NOT_FOUND', 'User not found');
   }
   // Cascade deletes refresh tokens via DB constraint
   await prisma.user.delete({ where: { id } });

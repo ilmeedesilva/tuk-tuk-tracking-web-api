@@ -1,12 +1,12 @@
-import { Router } from "express";
-import { body, param, query } from "express-validator";
-import * as deviceController from "../controllers/device.controller.js";
+import { Router } from 'express';
+import { body, param, query } from 'express-validator';
+import * as deviceController from '../controllers/device.controller.js';
 import {
   authenticate,
   authorise,
   authoriseMinRole,
-} from "../middleware/auth.js";
-import { handleValidation } from "../middleware/validate.js";
+} from '../middleware/auth.js';
+import { handleValidation } from '../middleware/validate.js';
 
 const router = Router();
 router.use(authenticate);
@@ -46,14 +46,14 @@ router.use(authenticate);
  *                 meta: { $ref: '#/components/schemas/PaginationMeta' }
  */
 router.get(
-  "/",
-  authoriseMinRole("DISTRICT_OFFICER"),
+  '/',
+  authoriseMinRole('DISTRICT_OFFICER'),
   [
-    query("page").optional().isInt({ min: 1 }).toInt(),
-    query("limit").optional().isInt({ min: 1, max: 100 }).toInt(),
-    query("status")
+    query('page').optional().isInt({ min: 1 }).toInt(),
+    query('limit').optional().isInt({ min: 1, max: 100 }).toInt(),
+    query('status')
       .optional()
-      .isIn(["UNASSIGNED", "ASSIGNED", "DECOMMISSIONED"]),
+      .isIn(['UNASSIGNED', 'ASSIGNED', 'DECOMMISSIONED']),
   ],
   handleValidation,
   deviceController.list,
@@ -77,9 +77,9 @@ router.get(
  *         $ref: '#/components/responses/NotFound'
  */
 router.get(
-  "/:id",
-  authoriseMinRole("DISTRICT_OFFICER"),
-  [param("id").notEmpty()],
+  '/:id',
+  authoriseMinRole('DISTRICT_OFFICER'),
+  [param('id').notEmpty()],
   handleValidation,
   deviceController.get,
 );
@@ -106,16 +106,16 @@ router.get(
  *         description: Serial number already exists
  */
 router.post(
-  "/",
-  authorise("HQ_ADMIN"),
+  '/',
+  authorise('HQ_ADMIN'),
   [
-    body("serialNumber")
+    body('serialNumber')
       .trim()
       .notEmpty()
-      .withMessage("Serial number is required"),
-    body("model").optional().trim(),
-    body("firmwareVersion").optional().trim(),
-    body("simIccid").optional().trim(),
+      .withMessage('Serial number is required'),
+    body('model').optional().trim(),
+    body('firmwareVersion').optional().trim(),
+    body('simIccid').optional().trim(),
   ],
   handleValidation,
   deviceController.create,
@@ -142,12 +142,12 @@ router.post(
  *         description: Device updated
  */
 router.put(
-  "/:id",
-  authorise("HQ_ADMIN"),
+  '/:id',
+  authorise('HQ_ADMIN'),
   [
-    param("id").notEmpty(),
-    body("model").optional().trim(),
-    body("firmwareVersion").optional().trim(),
+    param('id').notEmpty(),
+    body('model').optional().trim(),
+    body('firmwareVersion').optional().trim(),
   ],
   handleValidation,
   deviceController.update,
@@ -186,11 +186,11 @@ router.put(
  *         description: Device already assigned or vehicle already has a device
  */
 router.patch(
-  "/:id/assign",
-  authorise("HQ_ADMIN", "DISTRICT_OFFICER"),
+  '/:id/assign',
+  authorise('HQ_ADMIN', 'DISTRICT_OFFICER'),
   [
-    param("id").notEmpty(),
-    body("vehicleId").notEmpty().withMessage("Vehicle ID is required"),
+    param('id').notEmpty(),
+    body('vehicleId').notEmpty().withMessage('Vehicle ID is required'),
   ],
   handleValidation,
   deviceController.assign,
@@ -213,7 +213,7 @@ router.patch(
  *       409:
  *         description: Device is not currently assigned
  */
-router.patch("/:id/unassign", authorise("HQ_ADMIN"), deviceController.unassign);
+router.patch('/:id/unassign', authorise('HQ_ADMIN'), deviceController.unassign);
 
 /**
  * @swagger
@@ -232,8 +232,8 @@ router.patch("/:id/unassign", authorise("HQ_ADMIN"), deviceController.unassign);
  *         description: Device decommissioned
  */
 router.patch(
-  "/:id/decommission",
-  authorise("HQ_ADMIN"),
+  '/:id/decommission',
+  authorise('HQ_ADMIN'),
   deviceController.decommission,
 );
 

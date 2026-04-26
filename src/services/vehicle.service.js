@@ -1,27 +1,27 @@
-import { prisma } from "../config/database.js";
-import { createError } from "../middleware/errorHandler.js";
+import { prisma } from '../config/database.js';
+import { createError } from '../middleware/errorHandler.js';
 import {
   parsePagination,
   buildPaginationMeta,
   parseSort,
-} from "../utils/response.js";
+} from '../utils/response.js';
 
 const ALLOWED_SORT = [
-  "registrationNumber",
-  "driverName",
-  "status",
-  "createdAt",
+  'registrationNumber',
+  'driverName',
+  'status',
+  'createdAt',
 ];
 
 const buildWhere = (query, user) => {
   const where = {};
 
   // Scope enforcement by user role
-  if (user.role === "PROVINCIAL_ADMIN") {
+  if (user.role === 'PROVINCIAL_ADMIN') {
     where.district = { provinceId: user.provinceId };
   } else if (
-    user.role === "DISTRICT_OFFICER" ||
-    user.role === "STATION_OFFICER"
+    user.role === 'DISTRICT_OFFICER' ||
+    user.role === 'STATION_OFFICER'
   ) {
     where.districtId = user.districtId;
   }
@@ -30,20 +30,20 @@ const buildWhere = (query, user) => {
   if (query.districtId) {
     where.districtId = query.districtId;
   }
-  if (query.provinceId && user.role === "HQ_ADMIN") {
+  if (query.provinceId && user.role === 'HQ_ADMIN') {
     where.district = { provinceId: query.provinceId };
   }
   if (query.status) {
     where.status = query.status;
   }
   if (query.hasDevice !== undefined) {
-    where.deviceId = query.hasDevice === "true" ? { not: null } : null;
+    where.deviceId = query.hasDevice === 'true' ? { not: null } : null;
   }
   if (query.search) {
     where.OR = [
-      { registrationNumber: { contains: query.search, mode: "insensitive" } },
-      { driverName: { contains: query.search, mode: "insensitive" } },
-      { driverNic: { contains: query.search, mode: "insensitive" } },
+      { registrationNumber: { contains: query.search, mode: 'insensitive' } },
+      { driverName: { contains: query.search, mode: 'insensitive' } },
+      { driverNic: { contains: query.search, mode: 'insensitive' } },
     ];
   }
   return where;
@@ -98,7 +98,7 @@ export const getVehicle = async (id) => {
     },
   });
   if (!vehicle) {
-    throw createError(404, "VEHICLE_NOT_FOUND", "Vehicle not found");
+    throw createError(404, 'VEHICLE_NOT_FOUND', 'Vehicle not found');
   }
   return vehicle;
 };
@@ -108,7 +108,7 @@ export const createVehicle = async (data) => {
     where: { id: data.districtId },
   });
   if (!district) {
-    throw createError(400, "INVALID_REFERENCE", "District not found");
+    throw createError(400, 'INVALID_REFERENCE', 'District not found');
   }
   return prisma.vehicle.create({
     data,
@@ -119,7 +119,7 @@ export const createVehicle = async (data) => {
 export const updateVehicle = async (id, data) => {
   const exists = await prisma.vehicle.findUnique({ where: { id } });
   if (!exists) {
-    throw createError(404, "VEHICLE_NOT_FOUND", "Vehicle not found");
+    throw createError(404, 'VEHICLE_NOT_FOUND', 'Vehicle not found');
   }
   return prisma.vehicle.update({
     where: { id },
@@ -131,7 +131,7 @@ export const updateVehicle = async (id, data) => {
 export const setVehicleStatus = async (id, status) => {
   const exists = await prisma.vehicle.findUnique({ where: { id } });
   if (!exists) {
-    throw createError(404, "VEHICLE_NOT_FOUND", "Vehicle not found");
+    throw createError(404, 'VEHICLE_NOT_FOUND', 'Vehicle not found');
   }
   return prisma.vehicle.update({ where: { id }, data: { status } });
 };
@@ -139,7 +139,7 @@ export const setVehicleStatus = async (id, status) => {
 export const deleteVehicle = async (id) => {
   const vehicle = await prisma.vehicle.findUnique({ where: { id } });
   if (!vehicle) {
-    throw createError(404, "VEHICLE_NOT_FOUND", "Vehicle not found");
+    throw createError(404, 'VEHICLE_NOT_FOUND', 'Vehicle not found');
   }
 
   // Clean up related records first
@@ -150,7 +150,7 @@ export const deleteVehicle = async (id) => {
       ? [
           prisma.device.update({
             where: { id: vehicle.deviceId },
-            data: { status: "UNASSIGNED" },
+            data: { status: 'UNASSIGNED' },
           }),
         ]
       : []),

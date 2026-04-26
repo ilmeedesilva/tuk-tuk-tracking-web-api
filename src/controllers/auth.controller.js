@@ -1,12 +1,12 @@
-import * as authService from "../services/auth.service.js";
-import { sendSuccess } from "../utils/response.js";
+import * as authService from '../services/auth.service.js';
+import { sendSuccess } from '../utils/response.js';
 
 export const login = async (req, res, next) => {
   try {
     const result = await authService.login({
       username: req.body.username,
       password: req.body.password,
-      userAgent: req.headers["user-agent"],
+      userAgent: req.headers['user-agent'],
       ipAddress: req.ip,
     });
     return sendSuccess(res, result);
@@ -27,7 +27,7 @@ export const refresh = async (req, res, next) => {
 export const logout = async (req, res, next) => {
   try {
     await authService.logout(req.body.refreshToken);
-    return sendSuccess(res, { message: "Logged out successfully" });
+    return sendSuccess(res, { message: 'Logged out successfully' });
   } catch (err) {
     return next(err);
   }

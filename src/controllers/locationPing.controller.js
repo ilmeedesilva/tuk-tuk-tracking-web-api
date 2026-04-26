@@ -1,5 +1,5 @@
-import * as pingService from "../services/locationPing.service.js";
-import { sendSuccess, sendCreated } from "../utils/response.js";
+import * as pingService from '../services/locationPing.service.js';
+import { sendSuccess, sendCreated } from '../utils/response.js';
 
 export const submit = async (req, res, next) => {
   try {

@@ -1,6 +1,6 @@
-import { prisma } from "../config/database.js";
-import { createError } from "../middleware/errorHandler.js";
-import { parsePagination, buildPaginationMeta } from "../utils/response.js";
+import { prisma } from '../config/database.js';
+import { createError } from '../middleware/errorHandler.js';
+import { parsePagination, buildPaginationMeta } from '../utils/response.js';
 
 //Submit a location ping from a GPS device.
 export const submitPing = async (pingData, deviceUser) => {
@@ -12,26 +12,26 @@ export const submitPing = async (pingData, deviceUser) => {
   if (!device) {
     throw createError(
       403,
-      "DEVICE_NOT_REGISTERED",
-      "No device registered for this account",
+      'DEVICE_NOT_REGISTERED',
+      'No device registered for this account',
     );
   }
-  if (device.status !== "ASSIGNED") {
+  if (device.status !== 'ASSIGNED') {
     throw createError(
       403,
-      "DEVICE_NOT_ASSIGNED",
-      "Device is not assigned to any vehicle",
+      'DEVICE_NOT_ASSIGNED',
+      'Device is not assigned to any vehicle',
     );
   }
   if (!device.vehicle) {
     throw createError(
       403,
-      "NO_VEHICLE",
-      "No vehicle associated with this device",
+      'NO_VEHICLE',
+      'No vehicle associated with this device',
     );
   }
-  if (device.vehicle.status !== "ACTIVE") {
-    throw createError(403, "VEHICLE_INACTIVE", "Vehicle is not active");
+  if (device.vehicle.status !== 'ACTIVE') {
+    throw createError(403, 'VEHICLE_INACTIVE', 'Vehicle is not active');
   }
 
   const vehicleId = device.vehicle.id;
@@ -43,8 +43,8 @@ export const submitPing = async (pingData, deviceUser) => {
   if (pingTime > new Date(Date.now() + 30_000)) {
     throw createError(
       400,
-      "FUTURE_TIMESTAMP",
-      "Ping timestamp cannot be in the future",
+      'FUTURE_TIMESTAMP',
+      'Ping timestamp cannot be in the future',
     );
   }
 
@@ -83,7 +83,7 @@ export const submitPing = async (pingData, deviceUser) => {
 export const getVehicleHistory = async (vehicleId, query) => {
   const vehicle = await prisma.vehicle.findUnique({ where: { id: vehicleId } });
   if (!vehicle) {
-    throw createError(404, "VEHICLE_NOT_FOUND", "Vehicle not found");
+    throw createError(404, 'VEHICLE_NOT_FOUND', 'Vehicle not found');
   }
 
   const { page, limit, skip } = parsePagination(query);
@@ -99,7 +99,7 @@ export const getVehicleHistory = async (vehicleId, query) => {
   const [data, total] = await Promise.all([
     prisma.locationPing.findMany({
       where,
-      orderBy: { timestamp: query.order === "asc" ? "asc" : "desc" },
+      orderBy: { timestamp: query.order === 'asc' ? 'asc' : 'desc' },
       skip,
       take: limit,
     }),
@@ -124,10 +124,10 @@ export const queryPings = async (query, user) => {
     vehicleWhere.district = { provinceId: query.provinceId };
   }
 
-  if (user.role === "PROVINCIAL_ADMIN") {
+  if (user.role === 'PROVINCIAL_ADMIN') {
     vehicleWhere.district = { provinceId: user.provinceId };
   }
-  if (user.role === "DISTRICT_OFFICER" || user.role === "STATION_OFFICER") {
+  if (user.role === 'DISTRICT_OFFICER' || user.role === 'STATION_OFFICER') {
     vehicleWhere.districtId = user.districtId;
   }
 
@@ -148,7 +148,7 @@ export const queryPings = async (query, user) => {
   const [data, total] = await Promise.all([
     prisma.locationPing.findMany({
       where: pingWhere,
-      orderBy: { timestamp: "desc" },
+      orderBy: { timestamp: 'desc' },
       skip,
       take: limit,
       include: {

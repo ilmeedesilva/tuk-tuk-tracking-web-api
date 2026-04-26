@@ -1,5 +1,5 @@
-import * as liveService from "../services/liveTracking.service.js";
-import { sendSuccess } from "../utils/response.js";
+import * as liveService from '../services/liveTracking.service.js';
+import { sendSuccess } from '../utils/response.js';
 
 export const getLiveView = async (req, res, next) => {
   try {

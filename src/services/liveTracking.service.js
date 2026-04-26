@@ -1,6 +1,6 @@
-import { prisma } from "../config/database.js";
-import { createError } from "../middleware/errorHandler.js";
-import { parsePagination, buildPaginationMeta } from "../utils/response.js";
+import { prisma } from '../config/database.js';
+import { createError } from '../middleware/errorHandler.js';
+import { parsePagination, buildPaginationMeta } from '../utils/response.js';
 
 //Get last-known locations for all vehicles.
 export const getLiveView = async (query, user) => {
@@ -9,17 +9,17 @@ export const getLiveView = async (query, user) => {
   //determine which last_known_locations to include
   const vehicleWhere = {};
 
-  if (user.role === "PROVINCIAL_ADMIN") {
+  if (user.role === 'PROVINCIAL_ADMIN') {
     vehicleWhere.district = { provinceId: user.provinceId };
   }
-  if (user.role === "DISTRICT_OFFICER" || user.role === "STATION_OFFICER") {
+  if (user.role === 'DISTRICT_OFFICER' || user.role === 'STATION_OFFICER') {
     vehicleWhere.districtId = user.districtId;
   }
 
   if (query.districtId) {
     vehicleWhere.districtId = query.districtId;
   }
-  if (query.provinceId && user.role === "HQ_ADMIN") {
+  if (query.provinceId && user.role === 'HQ_ADMIN') {
     vehicleWhere.district = { provinceId: query.provinceId };
   }
   if (query.status) {
@@ -31,7 +31,7 @@ export const getLiveView = async (query, user) => {
   const [data, total] = await Promise.all([
     prisma.lastKnownLocation.findMany({
       where,
-      orderBy: { updatedAt: "desc" },
+      orderBy: { updatedAt: 'desc' },
       skip,
       take: limit,
       include: {
@@ -88,12 +88,12 @@ export const getVehicleLiveLocation = async (vehicleId) => {
       where: { id: vehicleId },
     });
     if (!vehicle) {
-      throw createError(404, "VEHICLE_NOT_FOUND", "Vehicle not found");
+      throw createError(404, 'VEHICLE_NOT_FOUND', 'Vehicle not found');
     }
     throw createError(
       404,
-      "NO_LOCATION_DATA",
-      "No location data available yet for this vehicle",
+      'NO_LOCATION_DATA',
+      'No location data available yet for this vehicle',
     );
   }
 
@@ -104,10 +104,10 @@ export const getVehicleLiveLocation = async (vehicleId) => {
 export const getLiveSummary = async (query, user) => {
   const vehicleWhere = {};
 
-  if (user.role === "PROVINCIAL_ADMIN") {
+  if (user.role === 'PROVINCIAL_ADMIN') {
     vehicleWhere.district = { provinceId: user.provinceId };
   }
-  if (user.role === "DISTRICT_OFFICER" || user.role === "STATION_OFFICER") {
+  if (user.role === 'DISTRICT_OFFICER' || user.role === 'STATION_OFFICER') {
     vehicleWhere.districtId = user.districtId;
   }
   if (query.districtId) {
@@ -120,7 +120,7 @@ export const getLiveSummary = async (query, user) => {
   const [totalVehicles, activeVehicles, vehiclesWithLocation, staleVehicles] =
     await Promise.all([
       prisma.vehicle.count({ where: vehicleWhere }),
-      prisma.vehicle.count({ where: { ...vehicleWhere, status: "ACTIVE" } }),
+      prisma.vehicle.count({ where: { ...vehicleWhere, status: 'ACTIVE' } }),
       prisma.lastKnownLocation.count({ where: { vehicle: vehicleWhere } }),
       prisma.lastKnownLocation.count({
         where: {

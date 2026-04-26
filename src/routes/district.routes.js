@@ -1,8 +1,8 @@
-import { Router } from "express";
-import { body, param, query } from "express-validator";
-import * as districtController from "../controllers/district.controller.js";
-import { authenticate, authorise, scopeGuard } from "../middleware/auth.js";
-import { handleValidation } from "../middleware/validate.js";
+import { Router } from 'express';
+import { body, param, query } from 'express-validator';
+import * as districtController from '../controllers/district.controller.js';
+import { authenticate, authorise, scopeGuard } from '../middleware/auth.js';
+import { handleValidation } from '../middleware/validate.js';
 
 const router = Router();
 router.use(authenticate);
@@ -48,13 +48,13 @@ router.use(authenticate);
  *                 meta: { $ref: '#/components/schemas/PaginationMeta' }
  */
 router.get(
-  "/",
+  '/',
   scopeGuard,
   [
-    query("page").optional().isInt({ min: 1 }).toInt(),
-    query("limit").optional().isInt({ min: 1, max: 100 }).toInt(),
-    query("sort").optional().isIn(["name", "code", "createdAt"]),
-    query("order").optional().isIn(["asc", "desc"]),
+    query('page').optional().isInt({ min: 1 }).toInt(),
+    query('limit').optional().isInt({ min: 1, max: 100 }).toInt(),
+    query('sort').optional().isIn(['name', 'code', 'createdAt']),
+    query('order').optional().isIn(['asc', 'desc']),
   ],
   handleValidation,
   districtController.list,
@@ -85,8 +85,8 @@ router.get(
  *         $ref: '#/components/responses/NotFound'
  */
 router.get(
-  "/:id",
-  [param("id").notEmpty()],
+  '/:id',
+  [param('id').notEmpty()],
   handleValidation,
   districtController.get,
 );
@@ -110,12 +110,12 @@ router.get(
  *         $ref: '#/components/responses/Forbidden'
  */
 router.post(
-  "/",
-  authorise("HQ_ADMIN"),
+  '/',
+  authorise('HQ_ADMIN'),
   [
-    body("name").trim().notEmpty().withMessage("District name is required"),
-    body("code").trim().notEmpty().toUpperCase().isLength({ min: 2, max: 8 }),
-    body("provinceId").notEmpty().withMessage("Province ID is required"),
+    body('name').trim().notEmpty().withMessage('District name is required'),
+    body('code').trim().notEmpty().toUpperCase().isLength({ min: 2, max: 8 }),
+    body('provinceId').notEmpty().withMessage('Province ID is required'),
   ],
   handleValidation,
   districtController.create,
@@ -143,13 +143,13 @@ router.post(
  *         description: District updated
  */
 router.put(
-  "/:id",
-  authorise("HQ_ADMIN"),
+  '/:id',
+  authorise('HQ_ADMIN'),
   [
-    param("id").notEmpty(),
-    body("name").optional().trim().notEmpty(),
-    body("code").optional().trim().toUpperCase(),
-    body("provinceId").optional().notEmpty(),
+    param('id').notEmpty(),
+    body('name').optional().trim().notEmpty(),
+    body('code').optional().trim().toUpperCase(),
+    body('provinceId').optional().notEmpty(),
   ],
   handleValidation,
   districtController.update,
@@ -172,6 +172,6 @@ router.put(
  *       409:
  *         description: Cannot delete — has police stations or vehicles
  */
-router.delete("/:id", authorise("HQ_ADMIN"), districtController.remove);
+router.delete('/:id', authorise('HQ_ADMIN'), districtController.remove);
 
 export default router;

@@ -1,12 +1,12 @@
-import { Router } from "express";
-import { body, param, query } from "express-validator";
-import * as userController from "../controllers/user.controller.js";
+import { Router } from 'express';
+import { body, param, query } from 'express-validator';
+import * as userController from '../controllers/user.controller.js';
 import {
   authenticate,
   authorise,
   authoriseMinRole,
-} from "../middleware/auth.js";
-import { handleValidation } from "../middleware/validate.js";
+} from '../middleware/auth.js';
+import { handleValidation } from '../middleware/validate.js';
 
 const router = Router();
 router.use(authenticate);
@@ -53,21 +53,21 @@ router.use(authenticate);
  *                 meta: { $ref: '#/components/schemas/PaginationMeta' }
  */
 router.get(
-  "/",
-  authoriseMinRole("DISTRICT_OFFICER"),
+  '/',
+  authoriseMinRole('DISTRICT_OFFICER'),
   [
-    query("page").optional().isInt({ min: 1 }).toInt(),
-    query("limit").optional().isInt({ min: 1, max: 100 }).toInt(),
-    query("role")
+    query('page').optional().isInt({ min: 1 }).toInt(),
+    query('limit').optional().isInt({ min: 1, max: 100 }).toInt(),
+    query('role')
       .optional()
       .isIn([
-        "HQ_ADMIN",
-        "PROVINCIAL_ADMIN",
-        "DISTRICT_OFFICER",
-        "STATION_OFFICER",
-        "DEVICE",
+        'HQ_ADMIN',
+        'PROVINCIAL_ADMIN',
+        'DISTRICT_OFFICER',
+        'STATION_OFFICER',
+        'DEVICE',
       ]),
-    query("isActive").optional().isBoolean(),
+    query('isActive').optional().isBoolean(),
   ],
   handleValidation,
   userController.list,
@@ -91,9 +91,9 @@ router.get(
  *         $ref: '#/components/responses/NotFound'
  */
 router.get(
-  "/:id",
-  authoriseMinRole("DISTRICT_OFFICER"),
-  [param("id").notEmpty()],
+  '/:id',
+  authoriseMinRole('DISTRICT_OFFICER'),
+  [param('id').notEmpty()],
   handleValidation,
   userController.get,
 );
@@ -119,26 +119,26 @@ router.get(
  *         description: Username or email already taken
  */
 router.post(
-  "/",
-  authorise("HQ_ADMIN", "PROVINCIAL_ADMIN"),
+  '/',
+  authorise('HQ_ADMIN', 'PROVINCIAL_ADMIN'),
   [
-    body("username").trim().notEmpty().isLength({ min: 3, max: 50 }),
-    body("password")
+    body('username').trim().notEmpty().isLength({ min: 3, max: 50 }),
+    body('password')
       .notEmpty()
       .isLength({ min: 8 })
-      .withMessage("Password must be at least 8 characters"),
-    body("email").normalizeEmail().isEmail(),
-    body("fullName").trim().notEmpty(),
-    body("role").isIn([
-      "HQ_ADMIN",
-      "PROVINCIAL_ADMIN",
-      "DISTRICT_OFFICER",
-      "STATION_OFFICER",
-      "DEVICE",
+      .withMessage('Password must be at least 8 characters'),
+    body('email').normalizeEmail().isEmail(),
+    body('fullName').trim().notEmpty(),
+    body('role').isIn([
+      'HQ_ADMIN',
+      'PROVINCIAL_ADMIN',
+      'DISTRICT_OFFICER',
+      'STATION_OFFICER',
+      'DEVICE',
     ]),
-    body("provinceId").optional().notEmpty(),
-    body("districtId").optional().notEmpty(),
-    body("policeStationId").optional().notEmpty(),
+    body('provinceId').optional().notEmpty(),
+    body('districtId').optional().notEmpty(),
+    body('policeStationId').optional().notEmpty(),
   ],
   handleValidation,
   userController.create,
@@ -165,13 +165,13 @@ router.post(
  *         description: User updated
  */
 router.put(
-  "/:id",
-  authorise("HQ_ADMIN", "PROVINCIAL_ADMIN"),
+  '/:id',
+  authorise('HQ_ADMIN', 'PROVINCIAL_ADMIN'),
   [
-    param("id").notEmpty(),
-    body("email").optional().normalizeEmail().isEmail(),
-    body("password").optional().isLength({ min: 8 }),
-    body("fullName").optional().trim().notEmpty(),
+    param('id').notEmpty(),
+    body('email').optional().normalizeEmail().isEmail(),
+    body('password').optional().isLength({ min: 8 }),
+    body('fullName').optional().trim().notEmpty(),
   ],
   handleValidation,
   userController.update,
@@ -193,8 +193,8 @@ router.put(
  *         description: User activated
  */
 router.patch(
-  "/:id/activate",
-  authorise("HQ_ADMIN", "PROVINCIAL_ADMIN"),
+  '/:id/activate',
+  authorise('HQ_ADMIN', 'PROVINCIAL_ADMIN'),
   userController.activate,
 );
 
@@ -214,8 +214,8 @@ router.patch(
  *         description: User deactivated
  */
 router.patch(
-  "/:id/deactivate",
-  authorise("HQ_ADMIN", "PROVINCIAL_ADMIN"),
+  '/:id/deactivate',
+  authorise('HQ_ADMIN', 'PROVINCIAL_ADMIN'),
   userController.deactivate,
 );
 
@@ -234,6 +234,6 @@ router.patch(
  *       204:
  *         description: Deleted
  */
-router.delete("/:id", authorise("HQ_ADMIN"), userController.remove);
+router.delete('/:id', authorise('HQ_ADMIN'), userController.remove);
 
 export default router;

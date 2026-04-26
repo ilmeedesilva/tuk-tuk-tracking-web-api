@@ -1,13 +1,13 @@
-import bcrypt from "bcryptjs";
-import { prisma } from "../config/database.js";
+import bcrypt from 'bcryptjs';
+import { prisma } from '../config/database.js';
 import {
   signAccessToken,
   signRefreshToken,
   verifyRefreshToken,
   TOKEN_EXPIRY,
-} from "../config/jwt.js";
-import { createError } from "../middleware/errorHandler.js";
-import logger from "../utils/logger.js";
+} from '../config/jwt.js';
+import { createError } from '../middleware/errorHandler.js';
+import logger from '../utils/logger.js';
 
 //Authenticate a user by username + password.
 //Returns access token, refresh token, and sanitised user object.
@@ -16,20 +16,20 @@ export const login = async ({ username, password, userAgent, ipAddress }) => {
   if (!user) {
     throw createError(
       401,
-      "INVALID_CREDENTIALS",
-      "Invalid username or password",
+      'INVALID_CREDENTIALS',
+      'Invalid username or password',
     );
   }
   if (!user.isActive) {
-    throw createError(401, "ACCOUNT_DISABLED", "Account has been deactivated");
+    throw createError(401, 'ACCOUNT_DISABLED', 'Account has been deactivated');
   }
 
   const valid = await bcrypt.compare(password, user.passwordHash);
   if (!valid) {
     throw createError(
       401,
-      "INVALID_CREDENTIALS",
-      "Invalid username or password",
+      'INVALID_CREDENTIALS',
+      'Invalid username or password',
     );
   }
 
@@ -57,7 +57,7 @@ export const login = async ({ username, password, userAgent, ipAddress }) => {
     .update({ where: { id: user.id }, data: { lastLoginAt: new Date() } })
     .catch(() => {});
 
-  logger.info("User logged in", { userId: user.id, role: user.role });
+  logger.info('User logged in', { userId: user.id, role: user.role });
 
   const { passwordHash: _ph, ...safeUser } = user;
   return {
@@ -76,8 +76,8 @@ export const refreshTokens = async (refreshToken) => {
   } catch {
     throw createError(
       401,
-      "INVALID_REFRESH_TOKEN",
-      "Refresh token is invalid or expired",
+      'INVALID_REFRESH_TOKEN',
+      'Refresh token is invalid or expired',
     );
   }
 
@@ -87,22 +87,22 @@ export const refreshTokens = async (refreshToken) => {
   if (!stored) {
     throw createError(
       401,
-      "REFRESH_TOKEN_REVOKED",
-      "Refresh token has been revoked",
+      'REFRESH_TOKEN_REVOKED',
+      'Refresh token has been revoked',
     );
   }
   if (stored.expiresAt < new Date()) {
     await prisma.refreshToken.delete({ where: { token: refreshToken } });
     throw createError(
       401,
-      "REFRESH_TOKEN_EXPIRED",
-      "Refresh token has expired",
+      'REFRESH_TOKEN_EXPIRED',
+      'Refresh token has expired',
     );
   }
 
   const user = await prisma.user.findUnique({ where: { id: payload.sub } });
   if (!user || !user.isActive) {
-    throw createError(401, "ACCOUNT_DISABLED", "Account is no longer active");
+    throw createError(401, 'ACCOUNT_DISABLED', 'Account is no longer active');
   }
 
   //refresh token rotation
@@ -160,7 +160,7 @@ export const getMe = async (userId) => {
     },
   });
   if (!user) {
-    throw createError(404, "USER_NOT_FOUND", "User not found");
+    throw createError(404, 'USER_NOT_FOUND', 'User not found');
   }
   return user;
 };

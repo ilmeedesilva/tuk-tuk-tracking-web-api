@@ -1,8 +1,8 @@
-import { Router } from "express";
-import { body, param, query } from "express-validator";
-import * as stationController from "../controllers/policeStation.controller.js";
-import { authenticate, authorise, scopeGuard } from "../middleware/auth.js";
-import { handleValidation } from "../middleware/validate.js";
+import { Router } from 'express';
+import { body, param, query } from 'express-validator';
+import * as stationController from '../controllers/policeStation.controller.js';
+import { authenticate, authorise, scopeGuard } from '../middleware/auth.js';
+import { handleValidation } from '../middleware/validate.js';
 
 const router = Router();
 router.use(authenticate);
@@ -44,11 +44,11 @@ router.use(authenticate);
  *                 meta: { $ref: '#/components/schemas/PaginationMeta' }
  */
 router.get(
-  "/",
+  '/',
   scopeGuard,
   [
-    query("page").optional().isInt({ min: 1 }).toInt(),
-    query("limit").optional().isInt({ min: 1, max: 100 }).toInt(),
+    query('page').optional().isInt({ min: 1 }).toInt(),
+    query('limit').optional().isInt({ min: 1, max: 100 }).toInt(),
   ],
   handleValidation,
   stationController.list,
@@ -79,8 +79,8 @@ router.get(
  *         $ref: '#/components/responses/NotFound'
  */
 router.get(
-  "/:id",
-  [param("id").notEmpty()],
+  '/:id',
+  [param('id').notEmpty()],
   handleValidation,
   stationController.get,
 );
@@ -104,14 +104,14 @@ router.get(
  *         $ref: '#/components/responses/Forbidden'
  */
 router.post(
-  "/",
-  authorise("HQ_ADMIN", "PROVINCIAL_ADMIN"),
+  '/',
+  authorise('HQ_ADMIN', 'PROVINCIAL_ADMIN'),
   [
-    body("name").trim().notEmpty().withMessage("Station name is required"),
-    body("code").trim().notEmpty().toUpperCase().isLength({ min: 2, max: 12 }),
-    body("districtId").notEmpty().withMessage("District ID is required"),
-    body("address").optional().trim(),
-    body("contact").optional().trim(),
+    body('name').trim().notEmpty().withMessage('Station name is required'),
+    body('code').trim().notEmpty().toUpperCase().isLength({ min: 2, max: 12 }),
+    body('districtId').notEmpty().withMessage('District ID is required'),
+    body('address').optional().trim(),
+    body('contact').optional().trim(),
   ],
   handleValidation,
   stationController.create,
@@ -138,14 +138,14 @@ router.post(
  *         description: Updated
  */
 router.put(
-  "/:id",
-  authorise("HQ_ADMIN", "PROVINCIAL_ADMIN"),
+  '/:id',
+  authorise('HQ_ADMIN', 'PROVINCIAL_ADMIN'),
   [
-    param("id").notEmpty(),
-    body("name").optional().trim().notEmpty(),
-    body("code").optional().trim().toUpperCase(),
-    body("address").optional().trim(),
-    body("contact").optional().trim(),
+    param('id').notEmpty(),
+    body('name').optional().trim().notEmpty(),
+    body('code').optional().trim().toUpperCase(),
+    body('address').optional().trim(),
+    body('contact').optional().trim(),
   ],
   handleValidation,
   stationController.update,
@@ -168,6 +168,6 @@ router.put(
  *       409:
  *         description: Cannot delete — has assigned users
  */
-router.delete("/:id", authorise("HQ_ADMIN"), stationController.remove);
+router.delete('/:id', authorise('HQ_ADMIN'), stationController.remove);
 
 export default router;

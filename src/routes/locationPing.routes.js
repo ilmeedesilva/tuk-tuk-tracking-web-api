@@ -1,13 +1,13 @@
-import { Router } from "express";
-import { body, param, query } from "express-validator";
-import * as pingController from "../controllers/locationPing.controller.js";
+import { Router } from 'express';
+import { body, param, query } from 'express-validator';
+import * as pingController from '../controllers/locationPing.controller.js';
 import {
   authenticate,
   authorise,
   authoriseMinRole,
-} from "../middleware/auth.js";
-import { handleValidation } from "../middleware/validate.js";
-import { locationPingRateLimiter } from "../middleware/rateLimiter.js";
+} from '../middleware/auth.js';
+import { handleValidation } from '../middleware/validate.js';
+import { locationPingRateLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
 router.use(authenticate);
@@ -47,23 +47,23 @@ router.use(authenticate);
  *         $ref: '#/components/responses/TooManyRequests'
  */
 router.post(
-  "/",
-  authorise("DEVICE"),
+  '/',
+  authorise('DEVICE'),
   locationPingRateLimiter,
   [
-    body("latitude")
+    body('latitude')
       .isFloat({ min: -90, max: 90 })
-      .withMessage("Latitude must be between -90 and 90"),
-    body("longitude")
+      .withMessage('Latitude must be between -90 and 90'),
+    body('longitude')
       .isFloat({ min: -180, max: 180 })
-      .withMessage("Longitude must be between -180 and 180"),
-    body("timestamp")
+      .withMessage('Longitude must be between -180 and 180'),
+    body('timestamp')
       .isISO8601()
-      .withMessage("Timestamp must be a valid ISO 8601 date-time"),
-    body("speed").optional().isFloat({ min: 0, max: 300 }),
-    body("heading").optional().isFloat({ min: 0, max: 360 }),
-    body("altitude").optional().isFloat(),
-    body("accuracy").optional().isFloat({ min: 0 }),
+      .withMessage('Timestamp must be a valid ISO 8601 date-time'),
+    body('speed').optional().isFloat({ min: 0, max: 300 }),
+    body('heading').optional().isFloat({ min: 0, max: 360 }),
+    body('altitude').optional().isFloat(),
+    body('accuracy').optional().isFloat({ min: 0 }),
   ],
   handleValidation,
   pingController.submit,
@@ -117,13 +117,13 @@ router.post(
  *                 meta: { $ref: '#/components/schemas/PaginationMeta' }
  */
 router.get(
-  "/",
-  authoriseMinRole("STATION_OFFICER"),
+  '/',
+  authoriseMinRole('STATION_OFFICER'),
   [
-    query("from").optional().isISO8601(),
-    query("to").optional().isISO8601(),
-    query("page").optional().isInt({ min: 1 }).toInt(),
-    query("limit").optional().isInt({ min: 1, max: 100 }).toInt(),
+    query('from').optional().isISO8601(),
+    query('to').optional().isISO8601(),
+    query('page').optional().isInt({ min: 1 }).toInt(),
+    query('limit').optional().isInt({ min: 1, max: 100 }).toInt(),
   ],
   handleValidation,
   pingController.query,
@@ -177,15 +177,15 @@ router.get(
  *         $ref: '#/components/responses/NotFound'
  */
 router.get(
-  "/:vehicleId/history",
-  authoriseMinRole("STATION_OFFICER"),
+  '/:vehicleId/history',
+  authoriseMinRole('STATION_OFFICER'),
   [
-    param("vehicleId").notEmpty(),
-    query("from").optional().isISO8601(),
-    query("to").optional().isISO8601(),
-    query("order").optional().isIn(["asc", "desc"]),
-    query("page").optional().isInt({ min: 1 }).toInt(),
-    query("limit").optional().isInt({ min: 1, max: 500 }).toInt(),
+    param('vehicleId').notEmpty(),
+    query('from').optional().isISO8601(),
+    query('to').optional().isISO8601(),
+    query('order').optional().isIn(['asc', 'desc']),
+    query('page').optional().isInt({ min: 1 }).toInt(),
+    query('limit').optional().isInt({ min: 1, max: 500 }).toInt(),
   ],
   handleValidation,
   pingController.getHistory,

@@ -1,9 +1,9 @@
-import { Router } from "express";
-import { body } from "express-validator";
-import * as authController from "../controllers/auth.controller.js";
-import { authenticate } from "../middleware/auth.js";
-import { handleValidation } from "../middleware/validate.js";
-import { authRateLimiter } from "../middleware/rateLimiter.js";
+import { Router } from 'express';
+import { body } from 'express-validator';
+import * as authController from '../controllers/auth.controller.js';
+import { authenticate } from '../middleware/auth.js';
+import { handleValidation } from '../middleware/validate.js';
+import { authRateLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
 
@@ -33,11 +33,11 @@ const router = Router();
  *         $ref: '#/components/responses/TooManyRequests'
  */
 router.post(
-  "/login",
+  '/login',
   authRateLimiter,
   [
-    body("username").trim().notEmpty().withMessage("Username is required"),
-    body("password").notEmpty().withMessage("Password is required"),
+    body('username').trim().notEmpty().withMessage('Username is required'),
+    body('password').notEmpty().withMessage('Password is required'),
   ],
   handleValidation,
   authController.login,
@@ -67,8 +67,8 @@ router.post(
  *         $ref: '#/components/responses/Unauthorized'
  */
 router.post(
-  "/refresh",
-  [body("refreshToken").notEmpty().withMessage("Refresh token is required")],
+  '/refresh',
+  [body('refreshToken').notEmpty().withMessage('Refresh token is required')],
   handleValidation,
   authController.refresh,
 );
@@ -94,9 +94,9 @@ router.post(
  *         description: Logged out successfully
  */
 router.post(
-  "/logout",
+  '/logout',
   authenticate,
-  [body("refreshToken").notEmpty().withMessage("Refresh token is required")],
+  [body('refreshToken').notEmpty().withMessage('Refresh token is required')],
   handleValidation,
   authController.logout,
 );
@@ -122,6 +122,6 @@ router.post(
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
-router.get("/me", authenticate, authController.getMe);
+router.get('/me', authenticate, authController.getMe);
 
 export default router;

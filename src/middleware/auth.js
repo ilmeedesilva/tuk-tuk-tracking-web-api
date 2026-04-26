@@ -1,23 +1,23 @@
-import { verifyAccessToken } from "../config/jwt.js";
-import { prisma } from "../config/database.js";
-import { createError } from "./errorHandler.js";
+import { verifyAccessToken } from '../config/jwt.js';
+import { prisma } from '../config/database.js';
+import { createError } from './errorHandler.js';
 
 //Role hierarchy
 const ROLE_ORDER = [
-  "DEVICE",
-  "STATION_OFFICER",
-  "DISTRICT_OFFICER",
-  "PROVINCIAL_ADMIN",
-  "HQ_ADMIN",
+  'DEVICE',
+  'STATION_OFFICER',
+  'DISTRICT_OFFICER',
+  'PROVINCIAL_ADMIN',
+  'HQ_ADMIN',
 ];
 
 //authenticate — verifies the Bearer JWT and attaches req.user.
 export const authenticate = async (req, _res, next) => {
   try {
     const authHeader = req.headers.authorization;
-    if (!authHeader?.startsWith("Bearer ")) {
+    if (!authHeader?.startsWith('Bearer ')) {
       return next(
-        createError(401, "MISSING_TOKEN", "Authorization header required"),
+        createError(401, 'MISSING_TOKEN', 'Authorization header required'),
       );
     }
 
@@ -42,14 +42,14 @@ export const authenticate = async (req, _res, next) => {
       return next(
         createError(
           401,
-          "USER_NOT_FOUND",
-          "User associated with token no longer exists",
+          'USER_NOT_FOUND',
+          'User associated with token no longer exists',
         ),
       );
     }
     if (!user.isActive) {
       return next(
-        createError(401, "ACCOUNT_DISABLED", "Account has been deactivated"),
+        createError(401, 'ACCOUNT_DISABLED', 'Account has been deactivated'),
       );
     }
 
@@ -66,15 +66,15 @@ export const authorise =
   (req, _res, next) => {
     if (!req.user) {
       return next(
-        createError(401, "UNAUTHENTICATED", "Authentication required"),
+        createError(401, 'UNAUTHENTICATED', 'Authentication required'),
       );
     }
     if (!roles.includes(req.user.role)) {
       return next(
         createError(
           403,
-          "FORBIDDEN",
-          `Access denied. Required role: ${roles.join(" or ")}. Your role: ${req.user.role}`,
+          'FORBIDDEN',
+          `Access denied. Required role: ${roles.join(' or ')}. Your role: ${req.user.role}`,
         ),
       );
     }
@@ -84,7 +84,7 @@ export const authorise =
 //allows minRole and any role with higher privilege.
 export const authoriseMinRole = (minRole) => (req, _res, next) => {
   if (!req.user) {
-    return next(createError(401, "UNAUTHENTICATED", "Authentication required"));
+    return next(createError(401, 'UNAUTHENTICATED', 'Authentication required'));
   }
 
   const userRoleIndex = ROLE_ORDER.indexOf(req.user.role);
@@ -94,7 +94,7 @@ export const authoriseMinRole = (minRole) => (req, _res, next) => {
     return next(
       createError(
         403,
-        "FORBIDDEN",
+        'FORBIDDEN',
         `Minimum required role: ${minRole}. Your role: ${req.user.role}`,
       ),
     );
@@ -105,7 +105,7 @@ export const authoriseMinRole = (minRole) => (req, _res, next) => {
 //scopeGuard — ensures non-HQ users can only access resources within their assigned scope.
 export const scopeGuard = (req, _res, next) => {
   const { user } = req;
-  if (!user || user.role === "HQ_ADMIN") {
+  if (!user || user.role === 'HQ_ADMIN') {
     return next();
   }
 
@@ -113,29 +113,29 @@ export const scopeGuard = (req, _res, next) => {
   const requestedDistrictId = req.query.districtId || req.body?.districtId;
 
   if (
-    user.role === "PROVINCIAL_ADMIN" &&
+    user.role === 'PROVINCIAL_ADMIN' &&
     requestedProvinceId &&
     requestedProvinceId !== user.provinceId
   ) {
     return next(
       createError(
         403,
-        "SCOPE_VIOLATION",
-        "Access restricted to your assigned province",
+        'SCOPE_VIOLATION',
+        'Access restricted to your assigned province',
       ),
     );
   }
 
   if (
-    (user.role === "DISTRICT_OFFICER" || user.role === "STATION_OFFICER") &&
+    (user.role === 'DISTRICT_OFFICER' || user.role === 'STATION_OFFICER') &&
     requestedDistrictId &&
     requestedDistrictId !== user.districtId
   ) {
     return next(
       createError(
         403,
-        "SCOPE_VIOLATION",
-        "Access restricted to your assigned district",
+        'SCOPE_VIOLATION',
+        'Access restricted to your assigned district',
       ),
     );
   }
