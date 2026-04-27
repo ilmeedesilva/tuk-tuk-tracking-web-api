@@ -1,0 +1,132 @@
+service: tuk-tuk-tracking-api
+
+frameworkVersion: "3"
+
+plugins:
+  - serverless-offline
+  - serverless-dotenv-plugin
+
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: ${opt:region, 'ap-south-1'}
+  stage: ${opt:stage, 'dev'}
+  memorySize: 512
+  timeout: 29
+
+  # IAM role permissions for the Lambda function
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: "arn:aws:logs:*:*:*"
+        - Effect: Allow
+          Action:
+            - ssm:GetParameter
+            - ssm:GetParameters
+          Resource:
+            - "arn:aws:ssm:${self:provider.region}:*:parameter/tuk-tuk-api/${self:provider.stage}/*"
+
+  # Environment variables
+  environment:
+    NODE_ENV: ${self:provider.stage}
+    DATABASE_URL: ${ssm:/tuk-tuk-api/${self:provider.stage}/DATABASE_URL, env:DATABASE_URL}
+    DIRECT_URL: ${ssm:/tuk-tuk-api/${self:provider.stage}/DIRECT_URL, env:DIRECT_URL}
+    JWT_SECRET: ${ssm:/tuk-tuk-api/${self:provider.stage}/JWT_SECRET, env:JWT_SECRET}
+    JWT_REFRESH_SECRET: ${ssm:/tuk-tuk-api/${self:provider.stage}/JWT_REFRESH_SECRET, env:JWT_REFRESH_SECRET}
+    JWT_ACCESS_EXPIRY: ${env:JWT_ACCESS_EXPIRY, '15m'}
+    JWT_REFRESH_EXPIRY: ${env:JWT_REFRESH_EXPIRY, '7d'}
+    CLOUDWATCH_LOG_GROUP: /tuk-tuk-api/${self:provider.stage}
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1"
+    LOG_LEVEL: ${env:LOG_LEVEL, 'info'}
+    ALLOWED_ORIGINS: ${env:ALLOWED_ORIGINS, '*'}
+    API_BASE_URL: !Sub "https://${ApiGatewayRestApi}.execute-api.${self:provider.region}.amazonaws.com/${self:provider.stage}"
+
+  # CloudWatch log retention
+  logs:
+    restApi:
+      accessLogging: false
+      executionLogging: false
+
+  # API Gateway configuration
+  apiGateway:
+    minimumCompressionSize: 1024
+    binaryMediaTypes:
+      - "multipart/form-data"
+
+  # VPC configuration
+  # vpc:
+  #   securityGroupIds:
+  #     - ${ssm:/tuk-tuk-api/${self:provider.stage}/VPC_SG_ID}
+  #   subnetIds:
+  #     - ${ssm:/tuk-tuk-api/${self:provider.stage}/VPC_SUBNET_1}
+  #     - ${ssm:/tuk-tuk-api/${self:provider.stage}/VPC_SUBNET_2}
+
+functions:
+  api:
+    handler: handler.handler
+    description: "Tuk-Tuk Tracking REST API — Sri Lanka Police"
+    events:
+      - http:
+          path: /
+          method: ANY
+          cors:
+            origin: "*"
+            headers:
+              - Content-Type
+              - Authorization
+              - X-Request-ID
+              - If-None-Match
+            allowCredentials: false
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors:
+            origin: "*"
+            headers:
+              - Content-Type
+              - Authorization
+              - X-Request-ID
+              - If-None-Match
+            allowCredentials: false
+    # reservedConcurrency: 50
+
+# Custom configuration per stage
+custom:
+  serverless-offline:
+    httpPort: 3000
+    noPrependStageInUrl: true
+
+  # Stage-specific overrides
+  stages:
+    dev:
+      memorySize: 256
+      timeout: 10
+    prod:
+      memorySize: 512
+      timeout: 29
+
+package:
+  individually: false
+  patterns:
+    - "!.git/**"
+    - "!.github/**"
+    - "!tests/**"
+    - "!scripts/**"
+    - "!*.md"
+    - "!.env*"
+    - "!coverage/**"
+    - "!prisma/migrations/**"
+    - "!node_modules/.prisma/client/libquery_engine-darwin*"
+    - "!node_modules/.prisma/client/libquery_engine-windows*"
+    - "!node_modules/.cache/**"
+    - "node_modules/.prisma/client/libquery_engine-rhel*"
+    - "prisma/schema.prisma"
+    - "handler.js"
+    - "src/**"

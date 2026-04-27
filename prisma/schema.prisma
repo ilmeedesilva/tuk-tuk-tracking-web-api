@@ -1,0 +1,209 @@
+// Prisma schema for Tuk-Tuk Real-Time Tracking System
+// Sri Lanka Police Law Enforcement Platform
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Administrative Boundary Models
+// ─────────────────────────────────────────────────────────────
+
+model Province {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  code      String     @unique // e.g., "WP", "CP"
+  districts District[]
+  users     User[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@map("provinces")
+}
+
+model District {
+  id             String          @id @default(cuid())
+  name           String
+  code           String          @unique // e.g., "CMB", "KAN"
+  province       Province        @relation(fields: [provinceId], references: [id])
+  provinceId     String
+  policeStations PoliceStation[]
+  vehicles       Vehicle[]
+  users          User[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@unique([name, provinceId])
+  @@index([provinceId])
+  @@map("districts")
+}
+
+model PoliceStation {
+  id         String   @id @default(cuid())
+  name       String
+  code       String   @unique // e.g., "CMB-HQ", "KAN-01"
+  address    String?
+  contact    String?
+  district   District @relation(fields: [districtId], references: [id])
+  districtId String
+  users      User[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([districtId])
+  @@map("police_stations")
+}
+
+// ─────────────────────────────────────────────────────────────
+// User & Auth Models
+// ─────────────────────────────────────────────────────────────
+
+enum Role {
+  HQ_ADMIN         // Police Headquarters - full access
+  PROVINCIAL_ADMIN // Provincial office - province-scoped access
+  DISTRICT_OFFICER // District station - district-scoped access
+  STATION_OFFICER  // Individual station - station-scoped access
+  DEVICE           // GPS tracking device - write-only location pings
+}
+
+model User {
+  id              String         @id @default(cuid())
+  username        String         @unique
+  passwordHash    String
+  email           String         @unique
+  fullName        String
+  role            Role
+  isActive        Boolean        @default(true)
+  lastLoginAt     DateTime?
+  // Scope-binding for non-HQ roles
+  province        Province?      @relation(fields: [provinceId], references: [id])
+  provinceId      String?
+  district        District?      @relation(fields: [districtId], references: [id])
+  districtId      String?
+  policeStation   PoliceStation? @relation(fields: [policeStationId], references: [id])
+  policeStationId String?
+  refreshTokens   RefreshToken[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([role])
+  @@index([provinceId])
+  @@index([districtId])
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  expiresAt DateTime
+  userAgent String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Vehicle & Device Models
+// ─────────────────────────────────────────────────────────────
+
+enum VehicleStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum DeviceStatus {
+  UNASSIGNED
+  ASSIGNED
+  DECOMMISSIONED
+}
+
+// GPS tracking device - constraint: one device per vehicle, cannot reassign active device
+model Device {
+  id              String       @id @default(cuid())
+  serialNumber    String       @unique
+  model           String?
+  firmwareVersion String?
+  simIccid        String?      @unique // SIM card identifier
+  status          DeviceStatus @default(UNASSIGNED)
+  // One-to-one: a device can only be assigned to one vehicle at a time
+  vehicle         Vehicle?
+  registeredAt    DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@map("devices")
+}
+
+model Vehicle {
+  id                 String             @id @default(cuid())
+  registrationNumber String             @unique // e.g., "WP ABC-1234"
+  driverName         String
+  driverNic          String             @unique // National ID - unique per driver
+  driverContact      String?
+  status             VehicleStatus      @default(ACTIVE)
+  // Geographic assignment
+  district           District           @relation(fields: [districtId], references: [id])
+  districtId         String
+  // Device assignment: @unique enforces one device per vehicle at DB level
+  device             Device?            @relation(fields: [deviceId], references: [id])
+  deviceId           String?            @unique
+  locationPings      LocationPing[]
+  lastKnownLocation  LastKnownLocation?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  @@index([districtId])
+  @@index([status])
+  @@index([deviceId])
+  @@map("vehicles")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Location Tracking Models
+// ─────────────────────────────────────────────────────────────
+
+model LocationPing {
+  id        String   @id @default(cuid())
+  vehicle   Vehicle  @relation(fields: [vehicleId], references: [id])
+  vehicleId String
+  latitude  Float
+  longitude Float
+  speed     Float?   // km/h
+  heading   Float?   // compass bearing 0–360 degrees
+  altitude  Float?   // meters above sea level
+  accuracy  Float?   // GPS accuracy radius in meters
+  timestamp DateTime // Device-reported time (may differ from createdAt)
+  createdAt DateTime @default(now()) // Server-received time
+
+  // Composite index for efficient time-window queries per vehicle
+  @@index([vehicleId, timestamp])
+  // Index for province/district-level time queries
+  @@index([timestamp])
+  @@map("location_pings")
+}
+
+// Materialised last-known position per vehicle for O(1) live-view queries
+model LastKnownLocation {
+  id        String   @id @default(cuid())
+  vehicle   Vehicle  @relation(fields: [vehicleId], references: [id])
+  vehicleId String   @unique
+  latitude  Float
+  longitude Float
+  speed     Float?
+  heading   Float?
+  timestamp DateTime
+  updatedAt DateTime @updatedAt
+
+  @@map("last_known_locations")
+}
