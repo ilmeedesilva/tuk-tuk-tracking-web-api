@@ -106,7 +106,7 @@ app.get('/api/docs.json', (_req, res) => {
 //   }),
 // );
 
-app.get(["/api/docs", "/api/docs/"], (_req, res) => {
+app.get(['/api/docs', '/api/docs/'], (_req, res) => {
   res.setHeader('Content-Type', 'text/html');
   res.send(`<!DOCTYPE html>
 <html>
