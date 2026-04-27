@@ -1,6 +1,6 @@
 # Tuk-Tuk Tracking API
 
-**Student ID:** [COBSCCOMP24.2P-029]
+**Student ID:** COBSCCOMP24.2P-029
 
 Real-Time Three-Wheeler (Tuk-Tuk) Tracking & Movement Logging System for Sri Lanka Law Enforcement.
 
@@ -10,7 +10,7 @@ A RESTful API built with **Node.js 20 / ES Modules**, **Express.js**, **Prisma O
 
 ## API Documentation (Swagger)
 
-- **Production:** `https://<api-gateway-id>.execute-api.ap-south-1.amazonaws.com/prod/api/docs`
+- **Production:** `https://97vfspxi93.execute-api.ap-south-1.amazonaws.com/prod/api/docs/`
 - **Local:** `http://localhost:3000/api/docs`
 
 ---
@@ -141,14 +141,12 @@ curl -X POST http://localhost:3000/api/v1/location-pings \
 main  ─── Production branch (auto-deploys to AWS via GitHub Actions)
   │
   └── dev  ─── Development branch (auto-deploys to dev AWS stage)
-        │
-        └── feature/xxx  ─── Feature branches (merge into dev)
 ```
 
 **Rules:**
 - Never commit directly to `main`
-- All features via pull requests into `dev`
-- `dev` → `main` via PR after testing
+- All features via pull requests into `dev/ilmee`
+- `dev/ilmee` → `main` via PR after testing
 
 ---
 
@@ -179,7 +177,7 @@ Set these secrets in GitHub repository settings:
 - `PROD_DATABASE_URL`, `PROD_DIRECT_URL`, `PROD_JWT_SECRET`, `PROD_JWT_REFRESH_SECRET`
 - `PROD_API_URL` (for post-deploy health check)
 
-Push to `dev` → deploys to dev Lambda.
+Push to `dev/ilmee` → deploys to dev Lambda.
 Push to `main` → deploys to production Lambda.
 
 ---
@@ -246,14 +244,4 @@ The architecture handles 10,000+ requests/second via:
 
 *NB6007CEM Web API Development — NIBM / Coventry University*
 
-## Contributing
 
-1. Create a feature branch from `dev`: `git checkout -b feature/your-feature dev`
-2. Commit your changes with conventional commit messages
-3. Push and create a Pull Request targeting `dev`
-4. After review and CI passes, merge to `dev`
-5. Production releases are merged from `dev` to `main`
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development workflow guidelines.
