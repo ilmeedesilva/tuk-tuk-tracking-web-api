@@ -33,7 +33,7 @@ export default [
       curly: ["error", "all"],
       "no-trailing-spaces": "error",
       semi: ["error", "always"],
-      quotes: ["error", "single", { avoidEscape: true }],
+      quotes: "off",
     },
   },
   {
