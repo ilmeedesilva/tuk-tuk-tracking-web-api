@@ -1,6 +1,6 @@
 {
   "name": "tuk-tuk-tracking-api",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Real-Time Three-Wheeler (Tuk-Tuk) Tracking & Movement Logging System for Sri Lanka Law Enforcement",
   "main": "handler.js",
   "type": "module",
