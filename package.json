@@ -1,6 +1,6 @@
 {
   "name": "tuk-tuk-tracking-api",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Real-Time Three-Wheeler (Tuk-Tuk) Tracking & Movement Logging System for Sri Lanka Law Enforcement",
   "main": "handler.js",
   "type": "module",
@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node handler.js",
-    "dev": "nodemon --experimental-specifier-resolution=node src/server.js",
+    "dev": "nodemon src/server.js",
     "build": "echo 'No build step required'",
     "lint": "eslint src/ scripts/ --ext .js",
     "lint:fix": "eslint src/ scripts/ --ext .js --fix",

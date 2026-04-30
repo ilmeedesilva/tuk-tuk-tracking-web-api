@@ -4,8 +4,14 @@ import { parsePagination, buildPaginationMeta } from '../utils/response.js';
 
 //Submit a location ping from a GPS device.
 export const submitPing = async (pingData, deviceUser) => {
+  // Extract serial number from device username (format: device.sn.tt.00001 -> SN-TT-00001)
+  const serialNumber = deviceUser.username
+    .replace(/^device\./, '')
+    .replace(/\./g, '-')
+    .toUpperCase();
+
   const device = await prisma.device.findUnique({
-    where: { serialNumber: deviceUser.username },
+    where: { serialNumber },
     include: { vehicle: true },
   });
 
