@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node handler.js",
-    "dev": "nodemon --experimental-specifier-resolution=node src/server.js",
+    "dev": "nodemon src/server.js",
     "build": "echo 'No build step required'",
     "lint": "eslint src/ scripts/ --ext .js",
     "lint:fix": "eslint src/ scripts/ --ext .js --fix",
