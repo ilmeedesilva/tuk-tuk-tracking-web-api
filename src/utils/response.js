@@ -40,9 +40,10 @@ export const parsePagination = (query) => {
 //Returns Prisma orderBy array.
 export const parseSort = (
   query,
-  allowedFields = ['createdAt', 'updatedAt'],
+  allowedFields = ["createdAt", "updatedAt"],
 ) => {
-  const field = allowedFields.includes(query.sort) ? query.sort : 'createdAt';
-  const direction = query.order === 'asc' ? 'asc' : 'desc';
+  const defaultField = allowedFields.length ? allowedFields[0] : "createdAt";
+  const field = allowedFields.includes(query.sort) ? query.sort : defaultField;
+  const direction = query.order === "asc" ? "asc" : "desc";
   return [{ [field]: direction }];
 };
